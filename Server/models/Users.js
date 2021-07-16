@@ -9,6 +9,7 @@ const Users = db.define("Users", {
 	national_id: DataTypes.STRING,
 	student_id: DataTypes.STRING,
 	parent: DataTypes.BIGINT,
+	password: DataTypes.STRING,
 	active: DataTypes.BOOLEAN,
 	admin: DataTypes.BOOLEAN,
 	super_admin: DataTypes.BOOLEAN,

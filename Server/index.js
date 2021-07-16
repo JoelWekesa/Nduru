@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const { json, urlencoded } = require("express");
 const { db } = require("./db/db");
-const usersAPI = require("./routes/users")
+const usersAPI = require("./routes/users");
 
 const app = express();
 
