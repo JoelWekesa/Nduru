@@ -11,6 +11,14 @@ const nodemailer = require("nodemailer");
 const router = Router();
 
 const { secrets } = process.env;
+const generator = Math.floor(1000000 * Math.random()).toString();
+const transporter = nodemailer.createTransport({
+	service: "gmail",
+	auth: {
+		user: process.env.EMAIL, //Your email must have lesssecure apps enabled. https://myaccount.google.com/lesssecureapps
+		pass: process.env.EMAIL_PASS,
+	},
+});
 
 router.post("/register", async (req, res) => {
 	const {
@@ -23,15 +31,6 @@ router.post("/register", async (req, res) => {
 		student_id,
 		attached_to,
 	} = req.body;
-
-	const transporter = nodemailer.createTransport({
-		service: "gmail",
-		auth: {
-			user: process.env.EMAIL, //Your email must have lesssecure apps enabled. https://myaccount.google.com/lesssecureapps
-			pass: process.env.EMAIL_PASS,
-		},
-	});
-	const generator = Math.floor(1000000 * Math.random()).toString();
 
 	if (!first_name) {
 		return res.status(400).json({
@@ -278,6 +277,100 @@ router.post("/login", async (req, res) => {
 		}
 		const token = jwt.sign({ id: user.id }, secrets, { expiresIn: "8h" });
 		return res.status(200).json({ user, token });
+	});
+});
+
+router.post("/resetpassword", async (req, res) => {
+	const { email } = req.body;
+	if (!email) {
+		return res
+			.status(200)
+			.json({ message: "Please input a valid email address." });
+	}
+
+	await Users.findOne({ where: { email } })
+		.then(async (user) => {
+			if (!user) {
+				return res.status(404).json({ message: "Invalid email address" });
+			}
+
+			await transporter.sendMail(
+				{
+					from: '"mHealth Kenya" <support@mhealthkenya.org>',
+					to: `${email}`,
+					subject: "Password reset code.",
+					html: `<b style = "text-transform: capitalize"> <p>Hi ${user.first_name}, </p> <p>Your password reset code is ${generator}</P></b>`, // html body
+				},
+				async (err, data) => {
+					if (err) {
+						return res.status(500).json({
+							error: err.message,
+						});
+					}
+
+					await Codes.create({
+						user: user.id,
+						code: bcrypt.hashSync(`${generator}`, 10),
+					})
+						.then(() => {
+							return res.status(200).json({
+								Success: "Successfully sent a reset code.",
+								user,
+							});
+						})
+						.catch((err) => {
+							return res.status(500).json({ message: err.message });
+						});
+				}
+			);
+		})
+		.catch((err) => {
+			return res.status(500).json({ message: err.message });
+		});
+});
+
+router.put("/resetpassword", async (req, res) => {
+	const { email, code, password } = req.body;
+	if (!email || !code || !password) {
+		return res.status(400).json({ message: "Please fill all fields" });
+	}
+	await Users.findOne({ where: { email } }).then(async (user) => {
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		await Codes.findAll({ where: { user: user.id } })
+			.then(async (codes) => {
+				const hash = codes[codes.length - 1].code;
+				const valid = bcrypt.compareSync(code, hash);
+				if (!valid) {
+					return res.status(400).json({
+						message: "Invalid reset code",
+					});
+				}
+
+				await Users.update(
+					{ password: bcrypt.hashSync(password) },
+					{ where: { id: user.id } }
+				)
+					.then(async () => {
+						await Codes.destroy({ where: { user: user.id } })
+							.then(() => {
+								return res
+									.status(200)
+									.json({ message: "Password reset successful" });
+							})
+							.catch((err) => {
+								return res.status(500).json({ message: err.message });
+							});
+					})
+					.catch((err) => {
+						return res.status(500).json({ message: err.message });
+					});
+			})
+			.catch((err) => {
+				return res.status(500).json({ message: err.message });
+			});
 	});
 });
 

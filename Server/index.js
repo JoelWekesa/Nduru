@@ -3,6 +3,7 @@ const cors = require("cors");
 const { json, urlencoded } = require("express");
 const { db } = require("./db/db");
 const usersAPI = require("./routes/users");
+const emergencyContactsAPI = require("./routes/emergencycontacts");
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(urlencoded({ extended: false }));
 
 //? APIs
 app.use("/api/users", usersAPI);
+app.use("/api/contacts", emergencyContactsAPI);
 
 const PORT = process.env.PORT || 5000;
 
