@@ -3,7 +3,6 @@ const { Router } = require("express");
 const { EmergencyContacts } = require("../models/EmergencyContacts");
 const { Users } = require("../models/Users");
 const jwt = require("jsonwebtoken");
-const fetchers = require("../middleware/emergencycontacts");
 const { secrets } = process.env;
 
 const router = Router();
@@ -110,7 +109,7 @@ router.get("/all/:id", async (req, res) => {
 					.then(async (contacts) => {
 						await Users.findByPk(requester)
 							.then(async (user) => {
-								if (user.id !== id && !user.provider) {
+								if (user.id !== id && !user.respondent) {
 									return res.status(403).json({
 										message:
 											"You are not authorized to view contacts you are not associated with",
