@@ -294,6 +294,10 @@ router.post("/resetpassword", async (req, res) => {
 				return res.status(404).json({ message: "Invalid email address" });
 			}
 
+			if(!user.active) {
+				return res.status(400).json({ message: "Please activate your account before you can request for a password reset code."});
+			}
+
 			await transporter.sendMail(
 				{
 					from: '"mHealth Kenya" <support@mhealthkenya.org>',
