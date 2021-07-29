@@ -6,6 +6,7 @@ const usersAPI = require("./routes/users");
 const emergencyContactsAPI = require("./routes/emergencycontacts");
 const providersAPI = require("./routes/providers")
 const respondentsAPI = require("./routes/respondents")
+const emergenciesAPI = require("./routes/emergencies")
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use("/api/users", usersAPI);
 app.use("/api/contacts", emergencyContactsAPI);
 app.use("/api/providers", providersAPI);
 app.use("/api/respondents", respondentsAPI);
+app.use("/api/emergencies", emergenciesAPI)
 
 const PORT = process.env.PORT || 5000;
 
