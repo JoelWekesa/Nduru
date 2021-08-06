@@ -4,9 +4,10 @@ const { json, urlencoded } = require("express");
 const { db } = require("./db/db");
 const usersAPI = require("./routes/users");
 const emergencyContactsAPI = require("./routes/emergencycontacts");
-const providersAPI = require("./routes/providers")
-const respondentsAPI = require("./routes/respondents")
-const emergenciesAPI = require("./routes/emergencies")
+const providersAPI = require("./routes/providers");
+const respondentsAPI = require("./routes/respondents");
+const emergenciesAPI = require("./routes/emergencies");
+const panicEmergencies = require("./routes/panic");
 
 const app = express();
 
@@ -19,7 +20,8 @@ app.use("/api/users", usersAPI);
 app.use("/api/contacts", emergencyContactsAPI);
 app.use("/api/providers", providersAPI);
 app.use("/api/respondents", respondentsAPI);
-app.use("/api/emergencies", emergenciesAPI)
+app.use("/api/emergencies", emergenciesAPI);
+app.use("/api/panic", panicEmergencies);
 
 const PORT = process.env.PORT || 5000;
 

@@ -20,6 +20,8 @@ const transporter = nodemailer.createTransport({
 	},
 });
 
+//? Register a user
+
 router.post("/register", async (req, res) => {
 	const {
 		first_name,
@@ -192,6 +194,8 @@ router.post("/register", async (req, res) => {
 	}
 });
 
+//? Activate user account
+
 router.put("/activate", async (req, res) => {
 	const { email, code } = req.body;
 	if (!email) {
@@ -252,6 +256,8 @@ router.put("/activate", async (req, res) => {
 	});
 });
 
+//? User login
+
 router.post("/login", async (req, res) => {
 	const { email, password } = req.body;
 	if (!email) {
@@ -280,6 +286,8 @@ router.post("/login", async (req, res) => {
 	});
 });
 
+//? Request password reset
+
 router.post("/resetpassword", async (req, res) => {
 	const { email } = req.body;
 	if (!email) {
@@ -294,8 +302,13 @@ router.post("/resetpassword", async (req, res) => {
 				return res.status(404).json({ message: "Invalid email address" });
 			}
 
-			if(!user.active) {
-				return res.status(400).json({ message: "Please activate your account before you can request for a password reset code."});
+			if (!user.active) {
+				return res
+					.status(400)
+					.json({
+						message:
+							"Please activate your account before you can request for a password reset code.",
+					});
 			}
 
 			await transporter.sendMail(
@@ -332,6 +345,8 @@ router.post("/resetpassword", async (req, res) => {
 			return res.status(500).json({ message: err.message });
 		});
 });
+
+//? Reset password
 
 router.put("/resetpassword", async (req, res) => {
 	const { email, code, password } = req.body;
@@ -376,6 +391,29 @@ router.put("/resetpassword", async (req, res) => {
 				return res.status(500).json({ message: err.message });
 			});
 	});
+});
+
+//? Get user details
+
+router.get("/user", async (req, res) => {
+	try {
+		const token = req.headers["access-token"];
+		await jwt.verify(token, secrets, async (err, response) => {
+			if (err) {
+				return res.status(401).json({ message: err.message });
+			}
+			const { id } = response;
+			await Users.findByPk(id)
+				.then((user) => {
+					return res.status(200).json({ user });
+				})
+				.catch((err) => {
+					return res.status(500).json({ message: err.message });
+				});
+		});
+	} catch (e) {
+		return res.status(500).json({ message: err.message });
+	}
 });
 
 module.exports = router;
