@@ -137,7 +137,7 @@ router.get("/all/:id", async (req, res) => {
 router.put("/edit/:id", async (req, res) => {
 	try {
 		const { id } = req.params;
-		const { access_token } = req.headers;
+		const token = req.headers["access-token"];
 		const {
 			contact_name,
 			contact_phone,
@@ -150,7 +150,7 @@ router.put("/edit/:id", async (req, res) => {
 				return res.status(404).json({ message: "Invalid contact id" });
 			}
 
-			jwt.verify(access_token, secrets, (err, response) => {
+			jwt.verify(token, secrets, (err, response) => {
 				if (err) {
 					return res.status(403).json({ message: err.message });
 				}
