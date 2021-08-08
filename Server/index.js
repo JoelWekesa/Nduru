@@ -7,7 +7,9 @@ const emergencyContactsAPI = require("./routes/emergencycontacts");
 const providersAPI = require("./routes/providers");
 const respondentsAPI = require("./routes/respondents");
 const emergenciesAPI = require("./routes/emergencies");
-const panicEmergencies = require("./routes/panic");
+const panicEmergenciesAPI = require("./routes/panic");
+const servicesAPI = require("./routes/services");
+const parentsAPI = require("./routes/parents");
 
 const app = express();
 
@@ -21,7 +23,9 @@ app.use("/api/contacts", emergencyContactsAPI);
 app.use("/api/providers", providersAPI);
 app.use("/api/respondents", respondentsAPI);
 app.use("/api/emergencies", emergenciesAPI);
-app.use("/api/panic", panicEmergencies);
+app.use("/api/panic", panicEmergenciesAPI);
+app.use("/api/services", servicesAPI);
+app.use("/api/parents", parentsAPI);
 
 const PORT = process.env.PORT || 5000;
 

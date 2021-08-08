@@ -61,6 +61,10 @@ router.post("/register", async (req, res) => {
 		});
 	}
 
+	if(student_id && !attached_to) {
+		return res.status(400).json({ message: "Please select your institution." });
+	}
+
 	if (!attached_to && !national_id) {
 		return res.status(400).json({
 			message:
