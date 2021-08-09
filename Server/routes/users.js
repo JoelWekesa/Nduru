@@ -11,7 +11,6 @@ const nodemailer = require("nodemailer");
 const router = Router();
 
 const { secrets } = process.env;
-const generator = Math.floor(1000000 * Math.random()).toString();
 const transporter = nodemailer.createTransport({
 	service: "gmail",
 	auth: {
@@ -23,6 +22,7 @@ const transporter = nodemailer.createTransport({
 //? Register a user
 
 router.post("/register", async (req, res) => {
+	const generator = Math.floor(1000000 * Math.random()).toString();
 	const {
 		first_name,
 		last_name,
@@ -243,7 +243,7 @@ router.put("/activate", async (req, res) => {
 						Codes.destroy({ where: { user: id } })
 							.then(() => {
 								return res.status(200).json({
-									Success: "Account activated.",
+									message: "Account activated.",
 								});
 							})
 							.catch((err) => {
@@ -294,6 +294,7 @@ router.post("/login", async (req, res) => {
 
 router.post("/resetpassword", async (req, res) => {
 	const { email } = req.body;
+	const generator = Math.floor(1000000 * Math.random()).toString();
 	if (!email) {
 		return res
 			.status(200)
