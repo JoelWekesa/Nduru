@@ -127,7 +127,7 @@ router.get("/my/emergencies", async (req, res) => {
 			}
 
 			const { id } = response;
-			await Emergencies.findAndCountAll({ where: { user: id } })
+			await Emergencies.findAndCountAll({ order:[["id", "DESC"]], where: { user: id }})
 				.then((emergencies) => {
 					return res.status(200).json({ emergencies });
 				})
